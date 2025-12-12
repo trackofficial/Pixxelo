@@ -16,9 +16,6 @@ import com.example.pixxelo.ui.theme.PixxeloTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-        }
+        setContentView(R.layout.main_screen)
     }
 }
-
