@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="80dp"
-        android:textSize="64dp"
+        android:textSize="58dp"
         android:text="Let’s pixxel something"
         android:fontFamily="@font/coolvetica"
         android:textColor="@color/white"/>
@@ -27,13 +27,14 @@
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="100dp"
             android:layout_gravity="center_horizontal"
             android:gravity="center">
 
             <Button
-                android:textSize="16dp"
-                android:layout_width="160dp"
+                android:id="@+id/create_image_button"
+                android:textSize="14dp"
+                android:layout_width="172dp"
                 android:layout_height="54dp"
                 android:background="@drawable/button_form"
                 android:text="Select image"
