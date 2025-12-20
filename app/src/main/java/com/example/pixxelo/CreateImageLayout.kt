@@ -29,9 +29,17 @@ class CreateImageLayout : ComponentActivity() {
 
         val imageView = findViewById<ImageView>(R.id.imageView)
         val uriString = intent.getStringExtra("imageUri")
+        if (uriString.isNullOrEmpty()) {
+            Toast.makeText(this, "Нет изображения для загрузки", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
         val uri = Uri.parse(uriString)
         original = loadBitmapFromUri(uri)
-        original = Bitmap.createScaledBitmap(original, 800, 800, true)
+        val targetHeight = 800
+        val aspectRatio = original.width.toFloat() / original.height.toFloat()
+        val targetWidth = (targetHeight * aspectRatio).toInt()
+        original = Bitmap.createScaledBitmap(original, targetWidth, targetHeight, true)
         imageView.setImageBitmap(original)
         currentBitmap = original
 
@@ -67,6 +75,17 @@ class CreateImageLayout : ComponentActivity() {
                 }
             }
         }
+        val btnHalftoneFigure = findViewById<Button>(R.id.button_dot_pic)
+        btnHalftoneFigure.setOnClickListener {
+            lifecycleScope.launch {
+                val halftone = withContext(Dispatchers.Default) { halftoneDotArt(original, 12) }
+                withContext(Dispatchers.Main) {
+                    imageView.setImageBitmap(halftone)
+                    currentBitmap = halftone
+                }
+            }
+        }
+
         btnSave.setOnClickListener {
             currentBitmap?.let { bmp ->
                 lifecycleScope.launch(Dispatchers.IO) {
@@ -84,7 +103,80 @@ class CreateImageLayout : ComponentActivity() {
             }
         }
     }
+    fun halftoneDotArt(src: Bitmap, blockSize: Int): Bitmap {
+            val width = src.width
+            val height = src.height
+            val gray = toGrayscale(src)
+            val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val canvas = android.graphics.Canvas(result)
+        canvas.drawColor(Color.BLACK)
+        val paint = android.graphics.Paint().apply {
+            isAntiAlias = true
+        }
+            val corners = listOf(
+            gray.getPixel(0, 0),
+            gray.getPixel(width - 1, 0),
+            gray.getPixel(0, height - 1),
+            gray.getPixel(width - 1, height - 1)
+        )
+        val avgR = corners.map { Color.red(it) }.average().toInt()
+        val backgroundColor = avgR
+        for (y in 0 until height step blockSize) {
+            for (x in 0 until width step blockSize) {
+                var sumGray = 0
+                var count = 0
+                var whiteCount = 0
+                var hasPureWhite = false
 
+                for (dy in 0 until blockSize) {
+                    for (dx in 0 until blockSize) {
+                        val px = x + dx
+                        val py = y + dy
+                        if (px < width && py < height) {
+                            val pixelGray = gray.getPixel(px, py)
+                            val brightness = Color.red(pixelGray)
+                            sumGray += brightness
+                            count++
+                            if (brightness > 250) hasPureWhite = true
+                            if (brightness > 220) whiteCount++
+                        }
+                    }
+                }
+                val avgGray = sumGray / count
+                val diff = Math.abs(avgGray - backgroundColor)
+
+                if (diff < 25) {
+                    continue
+                } else {
+                    if (hasPureWhite || avgGray > 230 || whiteCount.toFloat() / count > 0.3f) {
+                        val shade = 230
+                        paint.color = Color.rgb(shade, shade, shade)
+                        val radius = (blockSize / 2.5).toFloat()
+                        canvas.drawCircle(
+                            x + blockSize / 2f,
+                            y + blockSize / 2f,
+                            radius,
+                            paint
+                        )
+                    } else {
+                        val shade = avgGray
+                        paint.color = Color.rgb(shade, shade, shade)
+                        val radius = ((255 - avgGray) / 255.0 * blockSize / 2.8).toFloat()
+                        if (radius > 1f) {
+                            canvas.drawCircle(
+                                x + blockSize / 2f,
+                                y + blockSize / 2f,
+                                radius,
+                                paint
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        return result
+    }
     fun toGrayscale(src: Bitmap): Bitmap {
         val width = src.width
         val height = src.height

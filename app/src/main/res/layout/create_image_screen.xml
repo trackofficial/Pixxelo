@@ -11,8 +11,10 @@
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:scaleType="centerCrop"/>
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:background="#000000"/>
 
         <Button
             android:id="@+id/btn16"
@@ -29,6 +31,11 @@
         <Button
             android:id="@+id/btn64"
             android:text="64 levels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/button_dot_pic"
+            android:text="dot_pic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <Button
