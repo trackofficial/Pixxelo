@@ -2,6 +2,7 @@ package com.example.pixxelo
 
 import android.content.ContentValues
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -50,28 +51,33 @@ class CreateImageLayout : ComponentActivity() {
         btn16.setOnClickListener {
             lifecycleScope.launch {
                 val bmp16 = withContext(Dispatchers.Default) { pixelArt(original, 64, 16) }
+                val watermark = BitmapFactory.decodeResource(resources, R.drawable.icon_app_pixxelo_screen)
+                val withWatermark = withContext(Dispatchers.Default) { addWatermarkImage(bmp16, watermark) }
                 withContext(Dispatchers.Main) {
-                    imageView.setImageBitmap(bmp16)
-                    currentBitmap = bmp16
+                    imageView.setImageBitmap(withWatermark)
+                    currentBitmap = withWatermark
                 }
             }
         }
         btn32.setOnClickListener {
             lifecycleScope.launch {
                 val bmp32 = withContext(Dispatchers.Default) { pixelArt(original, 64, 32) }
+                val watermark = BitmapFactory.decodeResource(resources, R.drawable.icon_app_pixxelo_screen)
+                val withWatermark = withContext(Dispatchers.Default) { addWatermarkImage(bmp32, watermark) }
                 withContext(Dispatchers.Main) {
-                    imageView.setImageBitmap(bmp32)
-                    currentBitmap = bmp32
+                    imageView.setImageBitmap(withWatermark)
+                    currentBitmap = withWatermark
                 }
             }
         }
-
         btn64.setOnClickListener {
             lifecycleScope.launch {
                 val bmp64 = withContext(Dispatchers.Default) { pixelArt(original, 64, 64) }
+                val watermark = BitmapFactory.decodeResource(resources, R.drawable.icon_app_pixxelo_screen)
+                val withWatermark = withContext(Dispatchers.Default) { addWatermarkImage(bmp64, watermark) }
                 withContext(Dispatchers.Main) {
-                    imageView.setImageBitmap(bmp64)
-                    currentBitmap = bmp64
+                    imageView.setImageBitmap(withWatermark)
+                    currentBitmap = withWatermark
                 }
             }
         }
@@ -79,13 +85,14 @@ class CreateImageLayout : ComponentActivity() {
         btnHalftoneFigure.setOnClickListener {
             lifecycleScope.launch {
                 val halftone = withContext(Dispatchers.Default) { halftoneDotArt(original, 12) }
+                val watermark = BitmapFactory.decodeResource(resources, R.drawable.icon_app_pixxelo_screen)
+                val withWatermark = withContext(Dispatchers.Default) { addWatermarkImage(halftone, watermark) }
                 withContext(Dispatchers.Main) {
-                    imageView.setImageBitmap(halftone)
-                    currentBitmap = halftone
+                    imageView.setImageBitmap(withWatermark)
+                    currentBitmap = withWatermark
                 }
             }
         }
-
         btnSave.setOnClickListener {
             currentBitmap?.let { bmp ->
                 lifecycleScope.launch(Dispatchers.IO) {
@@ -240,5 +247,22 @@ class CreateImageLayout : ComponentActivity() {
         val small = Bitmap.createScaledBitmap(src, targetSize, targetSize, false)
         val quantized = quantizeGray(toGrayscale(small), levels)
         return Bitmap.createScaledBitmap(quantized, src.width, src.height, false)
+    }
+
+    fun addWatermarkImage(src: Bitmap, watermark: Bitmap): Bitmap {
+        val result = src.copy(Bitmap.Config.ARGB_8888, true)
+        val canvas = android.graphics.Canvas(result)
+
+        val margin = 20
+        val wmWidth = src.width / 8
+        val aspectRatio = watermark.width.toFloat() / watermark.height.toFloat()
+        val wmHeight = (wmWidth / aspectRatio).toInt()
+        val scaledWatermark = Bitmap.createScaledBitmap(watermark, wmWidth, wmHeight, true)
+
+        val left = src.width - wmWidth - margin
+        val top = src.height - wmHeight - margin
+
+        canvas.drawBitmap(scaledWatermark, left.toFloat(), top.toFloat(), null)
+        return result
     }
 }
