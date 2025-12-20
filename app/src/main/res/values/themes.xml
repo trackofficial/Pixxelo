@@ -4,5 +4,4 @@
     <style name="Theme.Pixxelo" parent="android:Theme.Material.Light.NoActionBar" >
         <item name="android:statusBarColor">@color/background_color</item>
     </style>
-
 </resources>

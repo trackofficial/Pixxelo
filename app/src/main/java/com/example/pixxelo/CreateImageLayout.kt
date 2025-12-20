@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -44,9 +45,9 @@ class CreateImageLayout : ComponentActivity() {
         imageView.setImageBitmap(original)
         currentBitmap = original
 
-        val btn16 = findViewById<Button>(R.id.btn16)
-        val btn32 = findViewById<Button>(R.id.btn32)
-        val btn64 = findViewById<Button>(R.id.btn64)
+        val btn16 = findViewById<ImageButton>(R.id.btn16)
+        val btn32 = findViewById<ImageButton>(R.id.btn32)
+        val btn64 = findViewById<ImageButton>(R.id.btn64)
         val btnSave = findViewById<Button>(R.id.btnSave)
         btn16.setOnClickListener {
             lifecycleScope.launch {
@@ -81,7 +82,7 @@ class CreateImageLayout : ComponentActivity() {
                 }
             }
         }
-        val btnHalftoneFigure = findViewById<Button>(R.id.button_dot_pic)
+        val btnHalftoneFigure = findViewById<ImageButton>(R.id.button_dot_pic)
         btnHalftoneFigure.setOnClickListener {
             lifecycleScope.launch {
                 val halftone = withContext(Dispatchers.Default) { halftoneDotArt(original, 12) }

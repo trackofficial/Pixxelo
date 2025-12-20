@@ -2,5 +2,6 @@
 <resources>
     <color name="background_color">#121214</color>
     <color name="image_background">#404046</color>
+    <color name="image_background_press">#2E2E31</color>
     <color name="white">#FFFFFFFF</color>
 </resources>
